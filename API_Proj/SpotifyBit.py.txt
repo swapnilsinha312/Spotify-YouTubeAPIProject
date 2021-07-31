@@ -1,0 +1,39 @@
+!pip install spotipy
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+import json
+# Set environment variables
+import os
+os.environ['SPOTIPY_CLIENT_ID'] = '' #Enter your id
+os.environ['SPOTIPY_CLIENT_SECRET'] = '' #Enter your secret
+os.environ['SPOTIPY_REDIRECT_URI'] = 'https://127.0.0.1:8080' 
+scope= 'playlist-modify-public'
+username= '' #Enter your username spotify
+token= SpotifyOAuth(scope=scope,username=username)
+spotipyObj= spotipy.Spotify(auth_manager= token)
+user_playlists= spotipyObj.user_playlists(user=username)
+user_playlist= user_playlists['items'][0] # you can check the index of the playlist you want to convert
+song_obj = spotipyObj.playlist_items(user_playlist['id'], fields=None, limit=100, offset=0, market=None, additional_types=('track', 'episode'))
+playlist_name=user_playlist['name']
+import pandas as pd
+list_songs= []
+list_songs.append(playlist_name)
+list_songs
+song_df= pd.DataFrame(song_obj['items'])
+playlist_size= len(song_df)
+for i in range(0,playlist_size):
+    song_name=  song_df.loc[:]['track'][i]['name']+' '
+    song_name+= song_df.loc[:]['track'][i]['album']['name']+' '
+    song_name+= song_df.loc[:]['track'][i]['artists'][0]['name']
+    list_songs.append(song_name)
+for i in range(0,len(list_songs)):
+    list_songs[i] = ''.join(x for x in list_songs[i] if x in string.printable)
+
+# list_songs[55]= 'What Would I Change It To (feat. Aluna) AVĪCI (01) Avicii' above line will ignore the non utf-8 characters in names as they throw error like the I in avici
+
+with open('listSong.txt', 'w') as filehandle:
+    filehandle.writelines("%s\n" % song for song in list_songs)
+len(list_songs)
+
+
+
